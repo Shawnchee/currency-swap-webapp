@@ -80,7 +80,7 @@ export function SwapWidget() {
                     <Button
                         type="button"
                         onClick={handleSwapCurrencies}
-                        className="bg-[#252836] border-4 border-[#0D0E14] rounded-lg hover:bg-[#2D3748] transition-transform active:scale-95"
+                        className="bg-[#252836] border-4 border-[#0D0E14] rounded-lg hover:bg-[#2D3748] transition-transform active:scale-95 cursor-pointer"
                     >
                         {loading ? (
                             <Loader2 className="w-3.5 h-3.5 text-[#C7F284] animate-spin" />
@@ -145,7 +145,7 @@ export function SwapWidget() {
             <Button
                 type="button"
                 onClick={executeSwap}
-                className="w-full mt-4 h-14 text-base font-bold rounded-2xl bg-[#C7F284] text-[#0D0E14] hover:bg-[#b0d96d] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full mt-4 h-14 text-base font-bold rounded-2xl bg-[#C7F284] text-[#0D0E14] hover:bg-[#b0d96d] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 disabled={!hasAmount || loading}
             >
                 {loading ? 'Calculating...' : hasAmount ? 'Swap' : 'Enter an amount'}
