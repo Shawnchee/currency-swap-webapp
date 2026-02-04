@@ -1,6 +1,6 @@
 'use client';
 
-import { EXCHANGE_RATES } from '@/src/types/currency_types';
+import { EXCHANGE_RATES } from '@/lib/exchange_rates';
 import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card';
 
 export function RatesTable() {
