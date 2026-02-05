@@ -1,7 +1,9 @@
 'use client';
 
+import { Suspense } from 'react';
 import { SwapWidget } from '@/components/SwapWidget';
 import { RatesTable } from '@/components/RatesTable';
+import { SwapWidgetLoader } from '@/components/SwapWidgetLoader';
 
 export default function Home() {
   return (
@@ -16,7 +18,9 @@ export default function Home() {
           </h1>
         </div>
 
-        <SwapWidget />
+        <Suspense fallback={<SwapWidgetLoader />}>
+          <SwapWidget />
+        </Suspense>
 
         <div className="mt-8 w-full flex justify-center">
           <RatesTable />
