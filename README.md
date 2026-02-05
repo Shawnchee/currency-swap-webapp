@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Currency Swap WebApp
 
-## Getting Started
+A reactive currency exchange webapp built with Next.js, TypeScript, and Tailwind CSS (hiring test)
 
-First, run the development server:
+## Quick Start
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Architecture
 
-## Learn More
+```
+src/
+├── hooks/useSwap.ts      # State management + URL sync
+├── components/           # UI components
+├── lib/
+│   ├── swap.ts           # Calculation logic
+│   ├── validation.ts     # Input validation
+│   └── exchange_rates.ts # Rate data
+└── types/
+    ├── currency.ts       # Currency types
+```
 
-To learn more about Next.js, take a look at the following resources:
+**Why this structure?**
+- Separation of concerns: logic in `lib/`, state in `hooks/`, UI in `components/`
+- Modularity: Keeping codebase as modular for easier maintaibility and readability
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Key Features
 
-## Deploy on Vercel
+### State Management
+- Single `useSwap` hook manages all swap state
+- Reactive calculation to allow users to see what they're getting at what rate
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### URL Sync
+- State syncs to URL: `?from=USD&to=MYR&amount=100&field=input`
+- Shareable links work on refresh (persistent)
+- Uses `useSearchParams` + `useRouter` from Next.js
+- `isInitializedRef` ensures URL is not overwritten on mount
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Race Condition Prevention
+- `AbortController` cancels stale calculations (from the reactive calculation)
+- Swap details are captured at click time (swap button) to prevent race conditions (e.g, if a user enters 100USD to swap, but when during the swap, the user quickly changes to 500USD)
+
+### Reverse Calculation
+- User can edit output amount 
+- Input amount recalculates with fee factored in
+- Both fields are fully bidirectional
+
+### Input Validation
+- Real-time format validation (valid numbers only)
+- Error codes for consistent messages (E001,E002 so far)
+
+### Mobile-First Design
+- Responsive layout (works on all screen sizes)
+
+---
+
+## Tech Stack
+
+- **Framework:** Next.js
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **UI:** shadcn/ui components
+
+---
+
+## Deploy
+
+```bash
+npm run build
+```
+
+Deployed to Vercel
