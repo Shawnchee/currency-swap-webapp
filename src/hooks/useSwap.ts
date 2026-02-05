@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { CurrencyCode } from '@/types';
+import { CurrencyCode } from '@/src/types/currency';
 import { calculateSwapOutput, calculateSwapInput, formatAmount, parseAmount } from '@/lib/swap';
 import { validateAmount, isValidCurrencyCode } from '@/lib/validation';
 

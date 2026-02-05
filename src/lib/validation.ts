@@ -1,4 +1,4 @@
-import { CurrencyCode } from '@/types';
+import { CurrencyCode } from '@/src/types/currency';
 import { EXCHANGE_RATES } from '@/lib/exchange_rates';
 
 // Error codes for swap validation
