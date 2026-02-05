@@ -27,10 +27,6 @@ export function calculateSwapOutput(
     return { outputAmount, fee, rate };
 }
 
-// regex helper function to check if input or output field value is valid (empty string or valid number)
-export function isValidAmount(value: string): boolean {
-    return value === '' || /^\d*\.?\d*$/.test(value);
-}
 
 // Reversed swapping function with 1% fee
 export function calculateSwapInput(
