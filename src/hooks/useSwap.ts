@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { CurrencyCode } from '@/types';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { CurrencyCode } from '@/src/types/currency';
 import { calculateSwapOutput, calculateSwapInput, formatAmount, parseAmount } from '@/lib/swap';
-import { validateAmount } from '@/lib/validation';
+import { validateAmount, isValidCurrencyCode } from '@/lib/validation';
 
 // Define types of swap state
 interface SwapState {
@@ -16,11 +17,29 @@ interface SwapState {
 }
 
 export function useSwap() {
-    const [inputCurrency, setInputCurrency] = useState<CurrencyCode>('USD');
-    const [outputCurrency, setOutputCurrency] = useState<CurrencyCode>('MYR');
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const isInitializedRef = useRef(false);
 
-    const [typedValue, setTypedValue] = useState<string>('');
-    const [activeField, setActiveField] = useState<'input' | 'output'>('input');
+    // Initialize state from URL or defaults
+    const getInitialCurrency = (param: string, fallback: CurrencyCode): CurrencyCode => {
+        const value = searchParams.get(param);
+        return isValidCurrencyCode(value) ? value : fallback;
+    };
+
+    const [inputCurrency, setInputCurrency] = useState<CurrencyCode>(() =>
+        getInitialCurrency('from', 'USD')
+    );
+    const [outputCurrency, setOutputCurrency] = useState<CurrencyCode>(() =>
+        getInitialCurrency('to', 'MYR')
+    );
+    const [typedValue, setTypedValue] = useState<string>(() =>
+        searchParams.get('amount') || ''
+    );
+    const [activeField, setActiveField] = useState<'input' | 'output'>(() => {
+        const field = searchParams.get('field');
+        return field === 'output' ? 'output' : 'input';
+    });
 
     // The derived state
     const [swapState, setSwapState] = useState<SwapState>({
@@ -34,6 +53,22 @@ export function useSwap() {
 
     // Race Condition Handler (tracking current request)
     const abortControllerRef = useRef<AbortController | null>(null);
+
+    // Sync state to URL (skip initial render to avoid overwriting on mount)
+    useEffect(() => {
+        if (!isInitializedRef.current) {
+            isInitializedRef.current = true;
+            return;
+        }
+
+        const params = new URLSearchParams();
+        params.set('from', inputCurrency);
+        params.set('to', outputCurrency);
+        if (typedValue) params.set('amount', typedValue);
+        params.set('field', activeField);
+
+        router.replace(`?${params.toString()}`, { scroll: false });
+    }, [inputCurrency, outputCurrency, typedValue, activeField, router]);
 
     // Handlers for user interaction
     const handleInputType = (value: string) => {

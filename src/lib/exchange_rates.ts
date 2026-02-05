@@ -1,4 +1,4 @@
-import { CurrencyCode } from '@/types';
+import { CurrencyCode } from '@/src/types/currency';
 
 export const EXCHANGE_RATES: Record<CurrencyCode, number> = {
     USD: 1.0,

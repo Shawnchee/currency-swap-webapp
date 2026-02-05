@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { CurrencyCode } from '@/types';
+import { CurrencyCode } from '@/src/types/currency';
 import { CURRENCIES } from '@/lib/api';
 import { Button } from './button';
 import { ChevronDown } from 'lucide-react';

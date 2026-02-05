@@ -1,4 +1,4 @@
-import { CurrencyCode, Currency } from '@/src/types';
+import { CurrencyCode, Currency } from '@/src/types/currency';
 
 export const CURRENCIES: Record<CurrencyCode, Currency> = {
     USD: { code: 'USD', name: 'US Dollar', decimals: 2 },
