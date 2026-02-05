@@ -5,6 +5,5 @@ export type CurrencyCode =
 export interface Currency {
     code: CurrencyCode;
     name: string;
-    symbol: string;
     decimals: number;
 }
