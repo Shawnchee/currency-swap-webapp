@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { CurrencyCode } from '@/types';
 import { calculateSwapOutput, calculateSwapInput, formatAmount, parseAmount } from '@/lib/swap';
-import { validateAmount, formatValidationError } from '@/lib/validation';
+import { validateAmount } from '@/lib/validation';
 
 // Define types of swap state
 interface SwapState {
@@ -46,98 +46,95 @@ export function useSwap() {
         setActiveField('output');
     };
 
-    // Swap logic
-    const executeSwap = async () => {
-        // Validate input
+    // Reset state when user changes currencies or typed value in input/output fields
+    useEffect(() => {
+        // Skip if no value to calculate
+        if (!typedValue || typedValue.trim() === '') {
+            setSwapState({
+                inputValue: '',
+                outputValue: '',
+                loading: false,
+                error: null,
+                fee: null,
+                rate: null,
+            });
+            return;
+        }
+
+        // Validate before calculating
         const validation = validateAmount(typedValue);
-
         if (!validation.valid) {
-            const errorMessage = formatValidationError(validation);
-
-            // how it work look like for dev debugging printouts
-            // if (process.env.NODE_ENV === 'development' && validation.error) {
-            //     console.log('[Validation Error]', {
-            //         code: validation.error.code,
-            //         message: validation.error.message,
-            //     });
-            // }
-
             setSwapState(prev => ({
                 ...prev,
-                error: errorMessage,
+                inputValue: activeField === 'input' ? typedValue : '',
+                outputValue: activeField === 'output' ? typedValue : '',
                 loading: false,
+                error: null,
+                rate: null,
             }));
             return;
         }
 
-        // Prevent race condition by aborting previous calculations
+        // Abort previous calculation (race condition prevention - for prod, this is where we would abort previous api calls)
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
         }
         const controller = new AbortController();
         abortControllerRef.current = controller;
 
-        // Loader for UX
+        // Start calculation
         setSwapState(prev => ({ ...prev, loading: true, error: null }));
 
-        try {
-            // Simulate network delay for 'API' calls for demo purposes 
-            await new Promise(resolve => setTimeout(resolve, 300));
-
-            // Check if aborted during the delay
+        // Debounce with 300ms delay (to mimic api call delay)
+        const timeoutId = setTimeout(async () => {
             if (controller.signal.aborted) return;
 
-            const amount = parseAmount(typedValue);
-            let resultInput = '';
-            let resultOutput = '';
-            let resultFee = 0;
-            let resultRate = 0;
+            try {
+                const amount = parseAmount(typedValue);
+                let resultInput = '';
+                let resultOutput = '';
+                let resultFee = 0;
+                let resultRate = 0;
 
-            if (activeField === 'input') {
-                // active field is input, meaning user types inside input for swapping
-                const { outputAmount, fee, rate } = calculateSwapOutput(amount, inputCurrency, outputCurrency);
-                resultInput = typedValue;
-                resultOutput = formatAmount(outputAmount, outputCurrency);
-                resultFee = fee;
-                resultRate = rate;
-            } else {
-                // active field is output, meaning user types inside output for swapping
-                const { inputAmount, fee, rate } = calculateSwapInput(amount, inputCurrency, outputCurrency);
-                resultInput = formatAmount(inputAmount, inputCurrency);
-                resultOutput = typedValue;
-                resultFee = fee;
-                resultRate = rate;
+                if (activeField === 'input') {
+                    // User typing in input field (reactive calculation)
+                    const { outputAmount, fee, rate } = calculateSwapOutput(amount, inputCurrency, outputCurrency);
+                    resultInput = typedValue;
+                    resultOutput = formatAmount(outputAmount, outputCurrency);
+                    resultFee = fee;
+                    resultRate = rate;
+                } else {
+                    // User typing in output field (reactive calculation)
+                    const { inputAmount, fee, rate } = calculateSwapInput(amount, inputCurrency, outputCurrency);
+                    resultInput = formatAmount(inputAmount, inputCurrency);
+                    resultOutput = typedValue;
+                    resultFee = fee;
+                    resultRate = rate;
+                }
+
+                if (!controller.signal.aborted) {
+                    setSwapState({
+                        inputValue: resultInput,
+                        outputValue: resultOutput,
+                        loading: false,
+                        error: null,
+                        fee: resultFee,
+                        rate: resultRate
+                    });
+                }
+            } catch (err) {
+                if (!controller.signal.aborted) {
+                    setSwapState(prev => ({ ...prev, loading: false, error: 'Calculation failed' }));
+                }
             }
+        }, 300);
 
-            setSwapState({
-                inputValue: resultInput,
-                outputValue: resultOutput,
-                loading: false,
-                error: null,
-                fee: resultFee,
-                rate: resultRate
-            });
-
-        } catch (err) {
-            if (!controller.signal.aborted) {
-                console.log("Error: ", err); // debugging printouts
-                setSwapState(prev => ({ ...prev, loading: false, error: 'Calculation failed' }));
-            }
-        }
-    };
-
-    // Reset state when user changes currencies or typed value in input/output fields
-    useEffect(() => {
-        setSwapState(prev => ({
-            ...prev,
-            loading: false,
-            error: null,
-            fee: null,
-            rate: null,
-            inputValue: activeField === 'input' ? typedValue : '',
-            outputValue: activeField === 'output' ? typedValue : ''
-        }));
-    }, [inputCurrency, outputCurrency, typedValue, activeField]);
+        // Cleaning up, aborting previous calculation and clearing timeout
+        return () => {
+            controller.abort();
+            clearTimeout(timeoutId);
+        };
+    }, [typedValue, activeField, inputCurrency, outputCurrency]);
 
 
     // swap currency function
@@ -164,6 +161,5 @@ export function useSwap() {
         handleInputType,
         handleOutputType,
         handleSwapCurrencies,
-        executeSwap,
     };
 }
