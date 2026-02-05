@@ -12,6 +12,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Currency Swap WebApp - Shawn",
   description: "hiring test for swapping currency",
+  icons: {
+    icon: "/symbol.svg",
+  },
 };
 
 export default function RootLayout({
