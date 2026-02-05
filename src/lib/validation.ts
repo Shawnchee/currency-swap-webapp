@@ -1,3 +1,6 @@
+import { CurrencyCode } from '@/types';
+import { EXCHANGE_RATES } from '@/lib/exchange_rates';
+
 // Error codes for swap validation
 export enum SwapErrorCode {
     INVALID_FORMAT = 'E001',
@@ -28,6 +31,11 @@ export function getErrorMessage(code: SwapErrorCode): string {
 export function isValidAmountFormat(value: string): boolean {
     // Allow empty string or valid number format
     return value === '' || /^\d*\.?\d*$/.test(value);
+}
+
+// Validate currency code against known currencies
+export function isValidCurrencyCode(code: string | null): code is CurrencyCode {
+    return code !== null && code in EXCHANGE_RATES;
 }
 
 // Validate amount input format
