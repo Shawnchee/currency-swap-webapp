@@ -28,7 +28,7 @@ export default function Home() {
       </main>
 
       <footer className="py-8 text-center">
-        <p className="text-[#67778E] text-[10px] font-bold tracking-widest uppercase opacity-50">
+        <p className="text-[#9CA3AF] text-[10px] font-bold tracking-widest uppercase opacity-50">
           Currency Exchange Platform
         </p>
       </footer>

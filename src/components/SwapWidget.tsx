@@ -83,14 +83,14 @@ export function SwapWidget() {
                 </div>
             </div>
 
-            <div className="mb-4 flex items-center gap-2 text-[#67778E] text-xs">
+            <div className="mb-4 flex items-center gap-2 text-[#9CA3AF] text-xs">
                 <Info className="w-3.5 h-3.5" />
                 <span>1% fee applies to all swaps</span>
             </div>
 
             <div className="space-y-1 relative">
                 <div className="bg-[#1B1D28] rounded-2xl p-4 border border-transparent focus-within:border-[#2D3748] transition-colors">
-                    <div className="text-[#67778E] text-xs font-medium mb-3">Sell</div>
+                    <div className="text-[#9CA3AF] text-xs font-medium mb-3">Sell</div>
                     <div className="flex items-center justify-between gap-4">
                         <CurrencyDropdown
                             value={inputCurrency}
@@ -114,18 +114,19 @@ export function SwapWidget() {
                     <Button
                         type="button"
                         onClick={handleSwapCurrencies}
+                        aria-label="Swap input and output currencies"
                         className="bg-[#252836] border-4 border-[#0D0E14] rounded-lg hover:bg-[#2D3748] transition-transform active:scale-95 cursor-pointer"
                     >
                         {loading ? (
                             <Loader2 className="w-3.5 h-3.5 text-[#C7F284] animate-spin" />
                         ) : (
-                            <ArrowDownUp className="w-3.5 h-3.5 text-[#67778E]" strokeWidth={3} />
+                            <ArrowDownUp className="w-3.5 h-3.5 text-[#9CA3AF]" strokeWidth={3} />
                         )}
                     </Button>
                 </div>
 
                 <div className="bg-[#1B1D28] rounded-2xl p-4 border border-transparent focus-within:border-[#2D3748] transition-colors">
-                    <div className="text-[#67778E] text-xs font-medium mb-3">Buy</div>
+                    <div className="text-[#9CA3AF] text-xs font-medium mb-3">Buy</div>
                     <div className="flex items-center justify-between gap-4">
                         <CurrencyDropdown
                             value={outputCurrency}
@@ -138,7 +139,7 @@ export function SwapWidget() {
                                 inputMode="decimal"
                                 value={outputValue}
                                 onChange={handleBuyChange}
-                                className={`bg-transparent border-none text-right text-4xl font-semibold p-2 h-auto focus-visible:ring-0 placeholder:text-[#4A5568] ${loading ? 'text-[#67778E]' : 'text-[#E2E8F0]'}`}
+                                className={`bg-transparent border-none text-right text-4xl font-semibold p-2 h-auto focus-visible:ring-0 placeholder:text-[#4A5568] ${loading ? 'text-[#9CA3AF]' : 'text-[#E2E8F0]'}`}
                                 placeholder="0.00"
                             />
                         </div>
@@ -157,7 +158,7 @@ export function SwapWidget() {
 
             {!hasAmount && (inputValue || outputValue) && !loading && !inputWarning && !outputWarning && (
                 <div className="mt-3 px-1">
-                    <p className="text-[#67778E] text-xs">
+                    <p className="text-[#9CA3AF] text-xs">
                         {ERROR_MESSAGES[SwapErrorCode.ZERO_OR_NEGATIVE]}
                     </p>
                 </div>
@@ -166,19 +167,19 @@ export function SwapWidget() {
             {hasAmount && fee !== null && !loading && (
                 <div className="mt-4 p-4 bg-[#1B1D28] rounded-xl border border-[#2D3748]/30 space-y-2">
                     <div className="flex justify-between text-sm">
-                        <span className="text-[#67778E]">You Pay</span>
+                        <span className="text-[#9CA3AF]">You Pay</span>
                         <span className="text-[#E2E8F0] font-medium">
                             {inputValue} {inputCurrency}
                         </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                        <span className="text-[#67778E]">Fee (1%)</span>
+                        <span className="text-[#9CA3AF]">Fee (1%)</span>
                         <span className="text-[#EF4444] font-medium">
                             - {formatAmount(fee, inputCurrency)} {inputCurrency}
                         </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                        <span className="text-[#67778E]">Amount to Exchange</span>
+                        <span className="text-[#9CA3AF]">Amount to Exchange</span>
                         <span className="text-[#E2E8F0] font-medium">
                             {formatAmount(parseFloat(inputValue.replace(/,/g, '')) - fee, inputCurrency)} {inputCurrency}
                         </span>
@@ -229,7 +230,7 @@ export function SwapWidget() {
                             onClick={() => setShowSuccessModal(false)}
                             className="absolute top-4 right-4 p-1 rounded-full hover:bg-[#1B1D28] transition-colors"
                         >
-                            <X className="w-5 h-5 text-[#67778E]" />
+                            <X className="w-5 h-5 text-[#9CA3AF]" />
                         </button>
 
                         <div className="flex justify-center mb-4">
@@ -241,21 +242,21 @@ export function SwapWidget() {
                         <h2 className="text-xl font-bold text-[#E2E8F0] text-center mb-2">
                             Swap Successful!
                         </h2>
-                        <p className="text-[#67778E] text-sm text-center mb-6">
+                        <p className="text-[#9CA3AF] text-sm text-center mb-6">
                             Your transaction has been completed
                         </p>
 
                         {swapDetails && (
                             <div className="bg-[#1B1D28] rounded-xl p-4 space-y-3 mb-6">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-[#67778E]">You Paid</span>
+                                    <span className="text-[#9CA3AF]">You Paid</span>
                                     <span className="text-[#E2E8F0] font-medium">
                                         {swapDetails.inputValue} {swapDetails.inputCurrency}
                                     </span>
                                 </div>
                                 {swapDetails.fee !== null && (
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-[#67778E]">Fee (1%)</span>
+                                        <span className="text-[#9CA3AF]">Fee (1%)</span>
                                         <span className="text-[#EF4444] font-medium">
                                             - {formatAmount(swapDetails.fee, swapDetails.inputCurrency as Parameters<typeof formatAmount>[1])} {swapDetails.inputCurrency}
                                         </span>
