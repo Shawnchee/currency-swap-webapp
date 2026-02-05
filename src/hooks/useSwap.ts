@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { CurrencyCode } from '@/types';
 import { calculateSwapOutput, calculateSwapInput, formatAmount, parseAmount } from '@/lib/swap';
+import { validateAmount, formatValidationError } from '@/lib/validation';
 
 // Define types of swap state
 interface SwapState {
@@ -47,7 +48,27 @@ export function useSwap() {
 
     // Swap logic
     const executeSwap = async () => {
-        if (!typedValue || parseFloat(typedValue) === 0) return;
+        // Validate input
+        const validation = validateAmount(typedValue);
+
+        if (!validation.valid) {
+            const errorMessage = formatValidationError(validation);
+
+            // how it work look like for dev debugging printouts
+            // if (process.env.NODE_ENV === 'development' && validation.error) {
+            //     console.log('[Validation Error]', {
+            //         code: validation.error.code,
+            //         message: validation.error.message,
+            //     });
+            // }
+
+            setSwapState(prev => ({
+                ...prev,
+                error: errorMessage,
+                loading: false,
+            }));
+            return;
+        }
 
         // Prevent race condition by aborting previous calculations
         if (abortControllerRef.current) {

@@ -1,11 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { CurrencyDropdown } from '@/components/ui/CurrencyDropdown';
 import { ArrowDownUp, Info, Loader2 } from 'lucide-react';
 import { useSwap } from '@/hooks/useSwap';
-import { formatAmount, isValidAmount } from '@/lib/swap';
+import { formatAmount } from '@/lib/swap';
+import { isValidAmountFormat, ERROR_MESSAGES, SwapErrorCode } from '@/lib/validation';
 
 export function SwapWidget() {
     const {
@@ -23,20 +25,41 @@ export function SwapWidget() {
         executeSwap,
     } = useSwap();
 
+    // Track validation errors
+    const [inputWarning, setInputWarning] = useState<string | null>(null);
+    const [outputWarning, setOutputWarning] = useState<string | null>(null);
+
     const hasAmount = (inputValue && parseFloat(inputValue) > 0) || (outputValue && parseFloat(outputValue) > 0);
+
+    const showWarning = (setter: typeof setInputWarning) => {
+        setter(ERROR_MESSAGES[SwapErrorCode.INVALID_FORMAT]);
+        setTimeout(() => setter(null), 2000); 
+    };
 
     const handleSellChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value;
-        if (isValidAmount(newValue)) {
-            handleInputType(newValue);
+
+        // Block invalid format and show warning based on error code (for input)
+        if (newValue && !isValidAmountFormat(newValue)) {
+            showWarning(setInputWarning);
+            return; 
         }
+
+        setInputWarning(null);
+        handleInputType(newValue);
     };
 
     const handleBuyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value;
-        if (isValidAmount(newValue)) {
-            handleOutputType(newValue);
+
+        // Block invalid format and show warning based on error code (for output)
+        if (newValue && !isValidAmountFormat(newValue)) {
+            showWarning(setOutputWarning);
+            return;
         }
+
+        setOutputWarning(null);
+        handleOutputType(newValue);
     };
 
     return (
@@ -74,6 +97,14 @@ export function SwapWidget() {
                             />
                         </div>
                     </div>
+                    {inputWarning && (
+                        <div className="mt-2 flex items-center gap-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                            <svg className="w-3.5 h-3.5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            <p className="text-orange-400 text-xs font-medium">{inputWarning}</p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
@@ -109,8 +140,24 @@ export function SwapWidget() {
                             />
                         </div>
                     </div>
+                    {outputWarning && (
+                        <div className="mt-2 flex items-center gap-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                            <svg className="w-3.5 h-3.5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            <p className="text-orange-400 text-xs font-medium">{outputWarning}</p>
+                        </div>
+                    )}
                 </div>
             </div>
+
+            {!hasAmount && (inputValue || outputValue) && !loading && (
+                <div className="mt-3 px-1">
+                    <p className="text-[#67778E] text-xs">
+                        {ERROR_MESSAGES[SwapErrorCode.ZERO_OR_NEGATIVE]}
+                    </p>
+                </div>
+            )}
 
             {hasAmount && fee !== null && !loading && (
                 <div className="mt-4 p-4 bg-[#1B1D28] rounded-xl border border-[#2D3748]/30 space-y-2">
