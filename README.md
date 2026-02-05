@@ -48,12 +48,12 @@ src/
 
 ### Race Condition Prevention
 - `AbortController` cancels stale calculations (from the reactive calculation)
-- Swap details are captured at click time (swap button) to prevent race conditions (e.g, if a user enters 100USD to swap, but when during the swap, the user quickly changes to 500USD)
+- Swap details are captured at click time (swap button) to prevent race conditions (e.g, if a user enters 100USD to swap, but when during the swap, the user quickly changes to 500USD, modal still shows 100USD)
 
 ### Reverse Calculation
-- User can edit output amount 
-- Input amount recalculates with fee factored in
-- Both fields are fully bidirectional
+- User can edit either input or output field
+- Opposite field recalculates automatically with 1% fee factored in
+- `activeField` state prevents circular loop updates
 
 ### Input Validation
 - Real-time format validation (valid numbers only)
@@ -80,3 +80,53 @@ npm run build
 ```
 
 Deployed to Vercel
+
+**Live URL:** [https://currency-swap-webapp-shawn.vercel.app/](https://currency-swap-webapp-shawn.vercel.app/)
+
+---
+
+## Performance
+
+### Lighthouse Audit Results
+
+#### Desktop
+![Lighthouse Score - Desktop](./public/lighthouse_audit_desktop.png)
+
+#### Mobile
+![Lighthouse Score - Mobile](./public/lighthouse_audit_mobile.png)
+
+#### Desktop Scores
+| Metric | Score |
+|--------|-------|
+| **Performance** | 100 |
+| **Accessibility** | 95 |
+| **Best Practices** | 100 |
+| **SEO** | 100 |
+
+#### Mobile Scores
+| Metric | Score |
+|--------|-------|
+| **Performance** | 99 |
+| **Accessibility** | 95 |
+| **Best Practices** | 100 |
+| **SEO** | 100 |
+
+### Core Web Vitals
+
+#### Desktop
+| Metric | Value | Status |
+|--------|-------|--------|
+| First Contentful Paint (FCP) | 0.3s | ✅ |
+| Largest Contentful Paint (LCP) | 0.4s | ✅ |
+| Total Blocking Time (TBT) | 0ms | ✅ |
+| Cumulative Layout Shift (CLS) | 0.004 | ✅ |
+| Speed Index (SI) | 0.3s | ✅ |
+
+#### Mobile
+| Metric | Value | Status |
+|--------|-------|--------|
+| First Contentful Paint (FCP) | 0.8s | ✅  |
+| Largest Contentful Paint (LCP) | 2.0s | 🟡 |
+| Total Blocking Time (TBT) | 60ms | ✅  |
+| Cumulative Layout Shift (CLS) | 0.007 | ✅  |
+| Speed Index (SI) | 0.8s | ✅  |
