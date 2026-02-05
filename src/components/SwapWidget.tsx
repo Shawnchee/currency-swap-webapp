@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { CurrencyDropdown } from '@/components/ui/CurrencyDropdown';
-import { ArrowDownUp, Info, Loader2 } from 'lucide-react';
+import { ArrowDownUp, Info, Loader2, CheckCircle2, X } from 'lucide-react';
 import { useSwap } from '@/hooks/useSwap';
 import { formatAmount } from '@/lib/swap';
 import { isValidAmountFormat, ERROR_MESSAGES, SwapErrorCode } from '@/lib/validation';
@@ -22,8 +22,19 @@ export function SwapWidget() {
         handleInputType,
         handleOutputType,
         handleSwapCurrencies,
-        executeSwap,
     } = useSwap();
+
+    // Captured swap details at click time (prevents race condition if user changes input)
+    interface SwapDetails {
+        inputValue: string;
+        outputValue: string;
+        inputCurrency: string;
+        outputCurrency: string;
+        fee: number | null;
+    }
+    const [swapDetails, setSwapDetails] = useState<SwapDetails | null>(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Track validation errors
     const [inputWarning, setInputWarning] = useState<string | null>(null);
@@ -33,7 +44,7 @@ export function SwapWidget() {
 
     const showWarning = (setter: typeof setInputWarning) => {
         setter(ERROR_MESSAGES[SwapErrorCode.INVALID_FORMAT]);
-        setTimeout(() => setter(null), 2000); 
+        setTimeout(() => setter(null), 2000);
     };
 
     const handleSellChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +53,7 @@ export function SwapWidget() {
         // Block invalid format and show warning based on error code (for input)
         if (newValue && !isValidAmountFormat(newValue)) {
             showWarning(setInputWarning);
-            return; 
+            return;
         }
 
         setInputWarning(null);
@@ -191,12 +202,91 @@ export function SwapWidget() {
 
             <Button
                 type="button"
-                onClick={executeSwap}
+                onClick={async () => {
+                    if (isSubmitting) return; // Prevent double-click 
+
+                    setIsSubmitting(true);
+
+                    // Capture values at click time (prevents race condition)
+                    setSwapDetails({
+                        inputValue,
+                        outputValue,
+                        inputCurrency,
+                        outputCurrency,
+                        fee
+                    });
+
+                    // Mock processing delay (simulates API call for swapping)
+                    // If in prod, use idempotency key to prevent duplicate transactions
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    setIsSubmitting(false);
+                    setShowSuccessModal(true);
+                }}
                 className="w-full mt-4 h-14 text-base font-bold rounded-2xl bg-[#C7F284] text-[#0D0E14] hover:bg-[#b0d96d] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                disabled={!hasAmount || loading}
+                disabled={!hasAmount || loading || isSubmitting}
             >
-                {loading ? 'Calculating...' : hasAmount ? 'Swap' : 'Enter an amount'}
+                {isSubmitting ? 'Processing...' : loading ? 'Calculating...' : hasAmount ? 'Swap' : 'Enter an amount'}
             </Button>
+
+            {showSuccessModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="w-full max-w-sm bg-[#0D0E14] border border-[#2D3748]/50 rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+                        <button
+                            onClick={() => setShowSuccessModal(false)}
+                            className="absolute top-4 right-4 p-1 rounded-full hover:bg-[#1B1D28] transition-colors"
+                        >
+                            <X className="w-5 h-5 text-[#67778E]" />
+                        </button>
+
+                        <div className="flex justify-center mb-4">
+                            <div className="w-16 h-16 rounded-full bg-[#C7F284]/20 flex items-center justify-center">
+                                <CheckCircle2 className="w-10 h-10 text-[#C7F284]" />
+                            </div>
+                        </div>
+
+                        <h2 className="text-xl font-bold text-[#E2E8F0] text-center mb-2">
+                            Swap Successful!
+                        </h2>
+                        <p className="text-[#67778E] text-sm text-center mb-6">
+                            Your transaction has been completed
+                        </p>
+
+                        {swapDetails && (
+                            <div className="bg-[#1B1D28] rounded-xl p-4 space-y-3 mb-6">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-[#67778E]">You Paid</span>
+                                    <span className="text-[#E2E8F0] font-medium">
+                                        {swapDetails.inputValue} {swapDetails.inputCurrency}
+                                    </span>
+                                </div>
+                                {swapDetails.fee !== null && (
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-[#67778E]">Fee (1%)</span>
+                                        <span className="text-[#EF4444] font-medium">
+                                            - {formatAmount(swapDetails.fee, swapDetails.inputCurrency as Parameters<typeof formatAmount>[1])} {swapDetails.inputCurrency}
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="h-px bg-[#2D3748]/50" />
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-[#E2E8F0] font-semibold">You Received</span>
+                                    <span className="text-[#C7F284] font-bold">
+                                        {swapDetails.outputValue} {swapDetails.outputCurrency}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        <Button
+                            onClick={() => setShowSuccessModal(false)}
+                            className="w-full h-12 text-base font-bold rounded-xl bg-[#C7F284] text-[#0D0E14] hover:bg-[#b0d96d] cursor-pointer"
+                        >
+                            Done
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
