@@ -38,6 +38,7 @@ src/
 ### State Management
 - Single `useSwap` hook manages all swap state
 - Reactive calculation to allow users to see what they're getting at what rate
+- `activeField` state to track which field the user is typing in (either `input` or `output`)
 
 ### URL Sync
 - State syncs to URL: `?from=USD&to=MYR&amount=100&field=input`
