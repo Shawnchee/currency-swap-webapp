@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { CurrencyCode } from '@/src/types/currency';
-import { CURRENCIES } from '@/lib/api';
 import { Button } from './button';
 import { ChevronDown } from 'lucide-react';
 import {
@@ -30,6 +29,9 @@ export function CurrencyDropdown({
     excludeCurrency,
 }: CurrencyDropdownProps) {
     const [open, setOpen] = React.useState(false);
+
+    // getting currency metadata
+    const { CURRENCIES } = require('@/lib/api');
 
     const currencies = Object.keys(CURRENCIES).filter(
         (code) => code !== excludeCurrency
