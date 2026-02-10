@@ -74,23 +74,23 @@ export function SwapWidget() {
     };
 
     return (
-        <div className="w-full max-w-[480px] bg-[#0D0E14] border border-[#2D3748]/50 rounded-[32px] p-6 shadow-2xl">
+        <div className="w-full max-w-[480px] bg-background border border-border/50 rounded-[32px] p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-                <div className="flex gap-1 bg-[#1B1D28] p-1 rounded-2xl">
-                    <Button variant="ghost" className="h-9 px-4 rounded-xl text-[#C7F284] bg-[#252836] hover:bg-[#252836] hover:text-[#C7F284] text-xs font-bold font-sans">
+                <div className="flex gap-1 bg-card p-1 rounded-2xl">
+                    <Button variant="ghost" className="h-9 px-4 rounded-xl text-primary bg-secondary hover:bg-secondary hover:text-primary text-xs font-bold font-sans">
                         Market
                     </Button>
                 </div>
             </div>
 
-            <div className="mb-4 flex items-center gap-2 text-[#9CA3AF] text-xs">
+            <div className="mb-4 flex items-center gap-2 text-muted-foreground text-xs">
                 <Info className="w-3.5 h-3.5" />
                 <span>1% fee applies to all swaps</span>
             </div>
 
             <div className="space-y-1 relative">
-                <div className="bg-[#1B1D28] rounded-2xl p-4 border border-transparent focus-within:border-[#2D3748] transition-colors">
-                    <div className="text-[#9CA3AF] text-xs font-medium mb-3">Sell</div>
+                <div className="bg-card rounded-2xl p-4 border border-transparent focus-within:border-border transition-colors">
+                    <div className="text-muted-foreground text-xs font-medium mb-3">Sell</div>
                     <div className="flex items-center justify-between gap-4">
                         <CurrencyDropdown
                             value={inputCurrency}
@@ -103,7 +103,7 @@ export function SwapWidget() {
                                 inputMode="decimal"
                                 value={inputValue}
                                 onChange={handleSellChange}
-                                className="bg-transparent border-none text-right text-4xl font-semibold text-[#E2E8F0] p-2 h-auto focus-visible:ring-0 placeholder:text-[#4A5568]"
+                                className="bg-transparent border-none text-right text-4xl font-semibold text-foreground p-2 h-auto focus-visible:ring-0 placeholder:text-placeholder"
                                 placeholder="0.00"
                             />
                         </div>
@@ -115,18 +115,18 @@ export function SwapWidget() {
                         type="button"
                         onClick={handleSwapCurrencies}
                         aria-label="Swap input and output currencies"
-                        className="bg-[#252836] border-4 border-[#0D0E14] rounded-lg hover:bg-[#2D3748] transition-transform active:scale-95 cursor-pointer"
+                        className="bg-secondary border-4 border-background rounded-lg hover:bg-border transition-transform active:scale-95 cursor-pointer"
                     >
                         {loading ? (
-                            <Loader2 className="w-3.5 h-3.5 text-[#C7F284] animate-spin" />
+                            <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />
                         ) : (
-                            <ArrowDownUp className="w-3.5 h-3.5 text-[#9CA3AF]" strokeWidth={3} />
+                            <ArrowDownUp className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={3} />
                         )}
                     </Button>
                 </div>
 
-                <div className="bg-[#1B1D28] rounded-2xl p-4 border border-transparent focus-within:border-[#2D3748] transition-colors">
-                    <div className="text-[#9CA3AF] text-xs font-medium mb-3">Buy</div>
+                <div className="bg-card rounded-2xl p-4 border border-transparent focus-within:border-border transition-colors">
+                    <div className="text-muted-foreground text-xs font-medium mb-3">Buy</div>
                     <div className="flex items-center justify-between gap-4">
                         <CurrencyDropdown
                             value={outputCurrency}
@@ -139,7 +139,7 @@ export function SwapWidget() {
                                 inputMode="decimal"
                                 value={outputValue}
                                 onChange={handleBuyChange}
-                                className={`bg-transparent border-none text-right text-4xl font-semibold p-2 h-auto focus-visible:ring-0 placeholder:text-[#4A5568] ${loading ? 'text-[#9CA3AF]' : 'text-[#E2E8F0]'}`}
+                                className={`bg-transparent border-none text-right text-4xl font-semibold p-2 h-auto focus-visible:ring-0 placeholder:text-placeholder ${loading ? 'text-muted-foreground' : 'text-foreground'}`}
                                 placeholder="0.00"
                             />
                         </div>
@@ -158,36 +158,36 @@ export function SwapWidget() {
 
             {!hasAmount && (inputValue || outputValue) && !loading && !inputWarning && !outputWarning && (
                 <div className="mt-3 px-1">
-                    <p className="text-[#9CA3AF] text-xs">
+                    <p className="text-muted-foreground text-xs">
                         {ERROR_MESSAGES[SwapErrorCode.ZERO_OR_NEGATIVE]}
                     </p>
                 </div>
             )}
 
             {hasAmount && fee !== null && !loading && (
-                <div className="mt-4 p-4 bg-[#1B1D28] rounded-xl border border-[#2D3748]/30 space-y-2">
+                <div className="mt-4 p-4 bg-card rounded-xl border border-border/30 space-y-2">
                     <div className="flex justify-between text-sm">
-                        <span className="text-[#9CA3AF]">You Pay</span>
-                        <span className="text-[#E2E8F0] font-medium">
+                        <span className="text-muted-foreground">You Pay</span>
+                        <span className="text-foreground font-medium">
                             {inputValue} {inputCurrency}
                         </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                        <span className="text-[#9CA3AF]">Fee (1%)</span>
-                        <span className="text-[#EF4444] font-medium">
+                        <span className="text-muted-foreground">Fee (1%)</span>
+                        <span className="text-destructive font-medium">
                             - {formatAmount(fee, inputCurrency)} {inputCurrency}
                         </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                        <span className="text-[#9CA3AF]">Amount to Exchange</span>
-                        <span className="text-[#E2E8F0] font-medium">
+                        <span className="text-muted-foreground">Amount to Exchange</span>
+                        <span className="text-foreground font-medium">
                             {formatAmount(parseFloat(inputValue.replace(/,/g, '')) - fee, inputCurrency)} {inputCurrency}
                         </span>
                     </div>
-                    <div className="h-px bg-[#2D3748]/50" />
+                    <div className="h-px bg-border/50" />
                     <div className="flex justify-between text-sm">
-                        <span className="text-[#E2E8F0] font-semibold">You Receive</span>
-                        <span className="text-[#C7F284] font-bold">
+                        <span className="text-foreground font-semibold">You Receive</span>
+                        <span className="text-primary font-bold">
                             {outputValue} {outputCurrency}
                         </span>
                     </div>
@@ -217,7 +217,7 @@ export function SwapWidget() {
                     setIsSubmitting(false);
                     setShowSuccessModal(true);
                 }}
-                className="w-full mt-4 h-14 text-base font-bold rounded-2xl bg-[#C7F284] text-[#0D0E14] hover:bg-[#b0d96d] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full mt-4 h-14 text-base font-bold rounded-2xl bg-primary text-primary-foreground hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 disabled={!hasAmount || loading || isSubmitting}
             >
                 {isSubmitting ? 'Processing...' : loading ? 'Calculating...' : hasAmount ? 'Swap' : 'Enter an amount'}
@@ -225,47 +225,47 @@ export function SwapWidget() {
 
             {showSuccessModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className="w-full max-w-sm bg-[#0D0E14] border border-[#2D3748]/50 rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+                    <div className="w-full max-w-sm bg-background border border-border/50 rounded-3xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
                         <button
                             onClick={() => setShowSuccessModal(false)}
-                            className="absolute top-4 right-4 p-1 rounded-full hover:bg-[#1B1D28] transition-colors"
+                            className="absolute top-4 right-4 p-1 rounded-full hover:bg-card transition-colors"
                         >
-                            <X className="w-5 h-5 text-[#9CA3AF]" />
+                            <X className="w-5 h-5 text-muted-foreground" />
                         </button>
 
                         <div className="flex justify-center mb-4">
-                            <div className="w-16 h-16 rounded-full bg-[#C7F284]/20 flex items-center justify-center">
-                                <CheckCircle2 className="w-10 h-10 text-[#C7F284]" />
+                            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
+                                <CheckCircle2 className="w-10 h-10 text-primary" />
                             </div>
                         </div>
 
-                        <h2 className="text-xl font-bold text-[#E2E8F0] text-center mb-2">
+                        <h2 className="text-xl font-bold text-foreground text-center mb-2">
                             Swap Successful!
                         </h2>
-                        <p className="text-[#9CA3AF] text-sm text-center mb-6">
+                        <p className="text-muted-foreground text-sm text-center mb-6">
                             Your transaction has been completed
                         </p>
 
                         {swapDetails && (
-                            <div className="bg-[#1B1D28] rounded-xl p-4 space-y-3 mb-6">
+                            <div className="bg-card rounded-xl p-4 space-y-3 mb-6">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-[#9CA3AF]">You Paid</span>
-                                    <span className="text-[#E2E8F0] font-medium">
+                                    <span className="text-muted-foreground">You Paid</span>
+                                    <span className="text-foreground font-medium">
                                         {swapDetails.inputValue} {swapDetails.inputCurrency}
                                     </span>
                                 </div>
                                 {swapDetails.fee !== null && (
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-[#9CA3AF]">Fee (1%)</span>
-                                        <span className="text-[#EF4444] font-medium">
+                                        <span className="text-muted-foreground">Fee (1%)</span>
+                                        <span className="text-destructive font-medium">
                                             - {formatAmount(swapDetails.fee, swapDetails.inputCurrency as Parameters<typeof formatAmount>[1])} {swapDetails.inputCurrency}
                                         </span>
                                     </div>
                                 )}
-                                <div className="h-px bg-[#2D3748]/50" />
+                                <div className="h-px bg-border/50" />
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-[#E2E8F0] font-semibold">You Received</span>
-                                    <span className="text-[#C7F284] font-bold">
+                                    <span className="text-foreground font-semibold">You Received</span>
+                                    <span className="text-primary font-bold">
                                         {swapDetails.outputValue} {swapDetails.outputCurrency}
                                     </span>
                                 </div>
@@ -274,7 +274,7 @@ export function SwapWidget() {
 
                         <Button
                             onClick={() => setShowSuccessModal(false)}
-                            className="w-full h-12 text-base font-bold rounded-xl bg-[#C7F284] text-[#0D0E14] hover:bg-[#b0d96d] cursor-pointer"
+                            className="w-full h-12 text-base font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/80 cursor-pointer"
                         >
                             Done
                         </Button>
